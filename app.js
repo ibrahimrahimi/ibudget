@@ -1,5 +1,28 @@
 // BUDGET CONTROLLER 
 var budgetController = (function() {
+
+    var Expense = function(id, description, value){
+        this.id = id;
+        this.description = description;
+        this.value;
+    };
+
+    var Income = function(id, description, value){
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+
+    var data = {
+        items: {
+            expenses: [],
+            incomes: []
+        },
+        totals: {
+            totalExpenses: 0,
+            totalIncomes: 0
+        }
+    };
     
 })();
 

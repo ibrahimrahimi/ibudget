@@ -15,17 +15,37 @@ var budgetController = (function() {
 
     var data = {
         items: {
-            expenses: [],
-            incomes: []
+            expense: [],
+            income: []
         },
         totals: {
             totalExpenses: 0,
             totalIncomes: 0
         }
     };
+
+    return {
+        newItem: function(type, description, val){
+            var newItem, id;
+
+            if(data.items[type].length > 0){
+                id = data.items[type][data.items[type].length - 1].id + 1
+            } else{ 
+                id = 0;
+            }
+
+            if(type === 'income'){
+                newItem = new Income(id, description, val);
+            } else if(type === 'expense'){
+                newItem = new Expense(id, description, val);
+            }
+
+            data.items[type].push(newItem);
+            return newItem;
+        }
+    }
     
 })();
-
 
 // UI CONTROLLER
 var UIController = (function() {
@@ -51,7 +71,6 @@ var UIController = (function() {
     }
 })();
 
-
 // PUBLIC APPLICATION CONTROLLER
 var controller = (function(budgetCtrl, uiCtrl) {
     var prepareEventListeners = function() {
@@ -66,7 +85,7 @@ var controller = (function(budgetCtrl, uiCtrl) {
 
     var ctrlAddItem = function(){
         var input = uiCtrl.getInput()
-        console.log(input);
+        budgetCtrl.newItem(input.type, input.description, input.value);
     };
 
     return {

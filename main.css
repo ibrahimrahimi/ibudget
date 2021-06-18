@@ -233,7 +233,12 @@ h2 {
     float: left;
 }
 
-.item_percentage {
+.item__value {
+    float: left;
+    transition: transform 0.3s 
+}
+
+.item__percentage {
     float: left;
     margin-left: 20px;
     transition: transform 0.3s;
@@ -275,7 +280,7 @@ h2 {
     outline: none;
 }
 
-.item__delete--btn-active {
+.item__delete--btn:active {
     transform: translateY(2px);
 }
 

@@ -1,10 +1,9 @@
 // BUDGET CONTROLLER 
 var budgetController = (function() {
-
     var Expense = function(id, description, value){
         this.id = id;
         this.description = description;
-        this.value;
+        this.value = value;
     };
 
     var Income = function(id, description, value){
@@ -49,12 +48,13 @@ var budgetController = (function() {
 
 // UI CONTROLLER
 var UIController = (function() {
-
     var domStrings = {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
-        inputAddBtn: '.add__btn' 
+        inputAddBtn: '.add__btn',
+        incomeContainer: '.income__list',
+        expensesContainer: '.expenses__list' 
     }
 
     return {
@@ -67,6 +67,26 @@ var UIController = (function() {
         },
         getDomString: function() {
             return domStrings;
+        },
+        addListItem: function(obj, type) {
+            var html, newHtml, element;
+
+            if(type === 'income'){
+                element = domStrings.incomeContainer;
+
+                html = '<div class="item clearfix" id="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            } else if(type === 'expense') {
+                element = domStrings.expensesContainer;
+
+                html = '<div class="item clearfix" id ="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">20%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            }
+            
+            html = html.replace('%id%', obj.id);
+            newHtml = html.replace('%description%', obj.description);
+            newHtml = newHtml.replace('%value%', obj.value);
+
+            document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+
         }
     }
 })();
@@ -75,7 +95,9 @@ var UIController = (function() {
 var controller = (function(budgetCtrl, uiCtrl) {
     var prepareEventListeners = function() {
         var dom = uiCtrl.getDomString();
+
         document.querySelector(dom.inputAddBtn).addEventListener('click', ctrlAddItem);
+
         document.addEventListener('keypress', function(e) {
             if(e.keycode === 13 || e.which === 13){
                 ctrlAddItem();
@@ -85,7 +107,10 @@ var controller = (function(budgetCtrl, uiCtrl) {
 
     var ctrlAddItem = function(){
         var input = uiCtrl.getInput()
-        budgetCtrl.newItem(input.type, input.description, input.value);
+
+        var newItem = budgetCtrl.newItem(input.type, input.description, input.value);
+
+        uiCtrl.addListItem(newItem, input.type);
     };
 
     return {

@@ -1,12 +1,12 @@
 // BUDGET CONTROLLER 
 var budgetController = (function() {
-    var Expense = function(id, description, value){
+    var Expense = function(id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
     };
 
-    var Income = function(id, description, value){
+    var Income = function(id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
@@ -20,27 +20,57 @@ var budgetController = (function() {
         totals: {
             totalExpenses: 0,
             totalIncomes: 0
-        }
+        },
+        budget: 0,
+        percentage: -1,
+    };
+
+    var calculateTotal = function(type) {
+        var sum = 0;
+        data.items[type].forEach(function(currentItem) {
+            sum += currentItem.value;
+        });
+        data.totals[type] = sum;
     };
 
     return {
-        newItem: function(type, description, val){
+        newItem: function(type, description, val) {
             var newItem, id;
 
-            if(data.items[type].length > 0){
+            if(data.items[type].length > 0) {
                 id = data.items[type][data.items[type].length - 1].id + 1
-            } else{ 
+            } else { 
                 id = 0;
             }
 
-            if(type === 'income'){
+            if(type === 'income') {
                 newItem = new Income(id, description, val);
-            } else if(type === 'expense'){
+            } else if(type === 'expense') {
                 newItem = new Expense(id, description, val);
             }
 
             data.items[type].push(newItem);
+
             return newItem;
+        },
+        calculateBudget: function() {
+            calculateTotal('income');
+            calculateTotal('expense');
+
+            data.budget = data.totals.income - data.totals.expense;
+            if(data.totals.expense > 0) {
+                data.percentage = Math.round(data.totals.expense / data.totals.income * 100);
+            } else {
+                data.percentage = -1;
+            }
+        },
+        getBudget: function() {
+            return {
+                budget: data.budget,
+                totalIncome: data.totals.income,
+                totalExpenses: data.totals.expense,
+                percentage: data.percentage
+            }
         }
     }
     
@@ -71,7 +101,7 @@ var UIController = (function() {
         addListItem: function(obj, type) {
             var html, newHtml, element;
 
-            if(type === 'income'){
+            if(type === 'income') {
                 element = domStrings.incomeContainer;
 
                 html = '<div class="item clearfix" id="%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
@@ -88,7 +118,7 @@ var UIController = (function() {
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
 
         },
-        clearFields: function(){
+        clearFields: function() {
             var fields, fieldsArr;
             fields = document.querySelectorAll(domStrings.inputDescription + ', ' + domStrings.inputValue);
 
@@ -119,10 +149,14 @@ var controller = (function(budgetCtrl, uiCtrl) {
     };
 
     var updateBudget = function(){
-        // This section whill update the budget after adding income.
+        budgetCtrl.calculateBudget();
+
+        var budget = budgetCtrl.getBudget();
+        
+        console.log('budget object: ', budget);
     };
 
-    var ctrlAddItem = function(){
+    var ctrlAddItem = function() {
         var input = uiCtrl.getInput()
 
         if(input.description !== "" ** !isNaN(input.value) && input.value > 0) {
@@ -132,12 +166,14 @@ var controller = (function(budgetCtrl, uiCtrl) {
             uiCtrl.addListItem(newItem, input.type);
     
             uiCtrl.clearFields();
+
+            updateBudget();
         }
 
     };
 
     return {
-        init: function(){
+        init: function() {
             console.log('Application started.');
             prepareEventListeners();
         }

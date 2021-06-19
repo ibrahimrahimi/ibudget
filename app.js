@@ -84,7 +84,11 @@ var UIController = (function() {
         inputValue: '.add__value',
         inputAddBtn: '.add__btn',
         incomeContainer: '.income__list',
-        expensesContainer: '.expenses__list' 
+        expensesContainer: '.expenses__list',
+        budgetValue: '.budget__value',
+        incomeLabel: '.budget__income--value',
+        expenseLabel: '.budget__expenses--value',
+        budgetPercentage: '.budget__expenses--percentage' 
     }
 
     return {
@@ -130,12 +134,22 @@ var UIController = (function() {
             });
 
             fieldsArr[0].focus();
+        },
+        displayBudget: function(budgetItem) {
+            document.querySelector(domStrings.budgetValue).textContent = budgetItem.budget;
+            document.querySelector(domStrings.incomeLabel).textContent = budgetItem.totalIncome;
+            document.querySelector(domStrings.expenseLabel).textContent = budgetItem.totalExpenses;
+            if(budgetItem.percentage > 0){
+                document.querySelector(domStrings.budgetPercentage).textContent = budgetItem.percentage +'%';
+            } else {
+                document.querySelector(domStrings.budgetPercentage).textContent = '---';
+            }
         }
     }
 })();
 
 // PUBLIC APPLICATION CONTROLLER
-var controller = (function(budgetCtrl, uiCtrl) {
+var controller = (function(budgetCtrl, uiCtrl) {''
     var prepareEventListeners = function() {
         var dom = uiCtrl.getDomString();
 
@@ -153,7 +167,7 @@ var controller = (function(budgetCtrl, uiCtrl) {
 
         var budget = budgetCtrl.getBudget();
         
-        console.log('budget object: ', budget);
+        uiCtrl.displayBudget(budget);
     };
 
     var ctrlAddItem = function() {
@@ -175,6 +189,12 @@ var controller = (function(budgetCtrl, uiCtrl) {
     return {
         init: function() {
             console.log('Application started.');
+            uiCtrl.displayBudget({
+                budget: 0,
+                totalIncome: 0,
+                totalExpenses: 0,
+                percentage: 0
+            })
             prepareEventListeners();
         }
     }
